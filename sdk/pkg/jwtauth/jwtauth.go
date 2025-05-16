@@ -2,11 +2,12 @@ package jwtauth
 
 import (
 	"crypto/rsa"
-	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -67,6 +68,9 @@ type GinJWTMiddleware struct {
 
 	// User can define own AntdLoginResponse func.
 	AntdLoginResponse func(*gin.Context, int, string, time.Time)
+
+	// User can define own AntdLoginResponse func.
+	ArcoLoginResponse func(*gin.Context, int, string, time.Time)
 
 	// User can define own RefreshResponse func.
 	RefreshResponse func(*gin.Context, int, string, time.Time)
@@ -334,6 +338,20 @@ func (mw *GinJWTMiddleware) MiddlewareInit() error {
 				"code":             http.StatusOK,
 				"success":          true,
 				"token":            token,
+				"currentAuthority": token,
+				"expire":           expire.Format(time.RFC3339),
+			})
+		}
+	}
+
+	if mw.ArcoLoginResponse == nil {
+		mw.ArcoLoginResponse = func(c *gin.Context, code int, token string, expire time.Time) {
+			c.JSON(http.StatusOK, gin.H{
+				"code":    http.StatusOK,
+				"success": true,
+				"data": map[string]interface{}{
+					"token": token,
+				},
 				"currentAuthority": token,
 				"expire":           expire.Format(time.RFC3339),
 			})
