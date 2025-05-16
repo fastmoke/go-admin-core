@@ -513,7 +513,7 @@ func (mw *GinJWTMiddleware) LoginHandler(c *gin.Context) {
 		)
 	}
 
-	mw.AntdLoginResponse(c, http.StatusOK, tokenString, expire)
+	mw.ArcoLoginResponse(c, http.StatusOK, tokenString, expire)
 }
 
 func (mw *GinJWTMiddleware) signedString(token *jwt.Token) (string, error) {
